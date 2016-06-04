@@ -374,7 +374,7 @@ DEFAULT_SEAHUB_DB=${TOPDIR}/seahub.db
 DEFAULT_CONF_DIR=${TOPDIR}/conf
 SEAFILE_DATA_DIR=${TOPDIR}/seafile-data
 LIBRARY_TEMPLATE_DIR=${SEAFILE_DATA_DIR}/library-template
-DEST_SETTINGS_PY=${TOPDIR}/seahub_settings.py
+DEST_SETTINGS_PY=${TOPDIR}/conf/seahub_settings.py
 CCNET_INIT=${INSTALLPATH}/seafile/bin/ccnet-init
 SEAF_SERVER_INIT=${INSTALLPATH}/seafile/bin/seaf-server-init
 MEDIA_DIR=${INSTALLPATH}/seahub/media
@@ -387,8 +387,11 @@ SEAFILE_SERVER_SYMLINK=${TOPDIR}/seafile-server-latest
 # Create ccnet conf
 # -------------------------------------------
 export SEAFILE_LD_LIBRARY_PATH=${INSTALLPATH}/seafile/lib/:${INSTALLPATH}/seafile/lib64:${LD_LIBRARY_PATH}
-LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" -c "${DEFAULT_CCNET_CONF_DIR}" \
-  --name "${SERVER_NAME}" --host "${IP_OR_DOMAIN}"
+LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH "${CCNET_INIT}" \
+  -F "${DEFAULT_CONF_DIR}" \
+  -c "${DEFAULT_CCNET_CONF_DIR}" \
+  --name "${SERVER_NAME}" \
+  --host "${IP_OR_DOMAIN}";
 
 # Fix service url
 eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${IP_OR_DOMAIN}/' ${DEFAULT_CCNET_CONF_DIR}/ccnet.conf"
@@ -397,8 +400,10 @@ eval "sed -i 's/^SERVICE_URL.*/SERVICE_URL = https:\/\/${IP_OR_DOMAIN}/' ${DEFAU
 # -------------------------------------------
 # Create seafile conf
 # -------------------------------------------
-LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH ${SEAF_SERVER_INIT} --seafile-dir "${SEAFILE_DATA_DIR}" \
-  --fileserver-port ${FILESERVER_PORT}
+LD_LIBRARY_PATH=$SEAFILE_LD_LIBRARY_PATH ${SEAF_SERVER_INIT} \
+  --central-config-dir "${DEFAULT_CONF_DIR}" \
+  --seafile-dir "${SEAFILE_DATA_DIR}" \
+  --fileserver-port ${FILESERVER_PORT};
 
 
 # -------------------------------------------
@@ -585,8 +590,8 @@ chown ${SEAFILE_USER}.nogroup -R /opt/seafile/
 # -------------------------------------------
 # Start seafile server
 # -------------------------------------------
-echo "Starting productive Seafile server"
-service seafile-server start
+# echo "Starting productive Seafile server"
+# service seafile-server start
 
 
 # -------------------------------------------
